@@ -9,15 +9,13 @@ from flask import Flask, request
 
 from counter_api import api
 
-
 app = Flask(__name__)
 app.register_blueprint(api, url_prefix='/counter')
 
 NUMBERS_FILENAME = 'real_nums.txt'
 
-CURRENT_API_ID, CURRENT_API_HASH = [line.rstrip() for line in
-                                    r.get('https://raw.githubusercontent.com/mitryp/api-test/main/current_keys'
-                                          ).content.decode().split('\n')]
+CURRENT_API_ID, CURRENT_API_HASH = r.get('https://raw.githubusercontent.com/mitryp/api-test/main/current_keys'
+                                         ).json()
 
 
 def shuffle_file(filename: str) -> Optional[str]:
@@ -75,7 +73,7 @@ def get_numbers(count: int) -> List[str]:
     return numbers
 
 
-@app.route('/get-api')
+@app.route('/get-tg-api')
 def get_api():
     return {
         'id': CURRENT_API_ID,
@@ -88,7 +86,3 @@ def get_phone_numbers():
     count = request.args.get('count')
 
     return json.dumps(get_numbers(int(count) if count else 100))
-
-
-if __name__ == '__main__':
-    app.run()
